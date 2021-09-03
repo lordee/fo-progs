@@ -65,7 +65,7 @@ class nailgun_c : weapon_c
 
         if (player.ammunition_nails < 1)
         {
-            player.current_weapon = player.GetBestWeapon();
+            player.ChangeWeapon(player.GetBestWeapon());
             return;
         }
 

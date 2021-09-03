@@ -34,4 +34,25 @@ class grenadelauncher_c : weapon_c
 
         return TRUE;
     };
+
+    virtual void (WEAPON weap) ToggleMode =
+    {
+        player_c player = (player_c)this.owner;
+        if (player.current_weapon == this && this.weapon_type == weap)
+        {
+            this.message = "";
+            return;
+        }
+
+        switch (weap)
+        {
+            case WEAPON::GRENADELAUNCHER:
+                    this.message = "Normal grenade mode";
+                break;
+            case WEAPON::PIPEBOMBLAUNCHER:
+                    this.message = "Pipebomb mode";
+                break;
+        }
+        this.weapon_type = weap;
+    };
 };

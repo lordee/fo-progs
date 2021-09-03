@@ -65,14 +65,13 @@ class Demoman : entity
         proj_pipebomb_c oldest = __NULL__;
         while (pipe)
         {
-            if (pipe.owner == player)
+            if (pipe.owner == player && pipe.nextthink > 0)
             {
                 if (!oldest)
                     oldest = pipe;
                 else if (oldest.nextthink > pipe.nextthink)
-                        oldest = pipe;
+                    oldest = pipe;
             }
-
             pipe = (proj_pipebomb_c)find(pipe, ::classname, "pipebomb");
         }
 

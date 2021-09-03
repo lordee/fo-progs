@@ -144,6 +144,7 @@ enum TFCLASSNAMES : string
 
 enum WEAPON
 {
+    NONE,
     AXE,
     SPANNER,
     SNIPERRIFLE,

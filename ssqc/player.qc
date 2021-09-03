@@ -445,6 +445,8 @@ class player_c : entity
 		this.weaponframe = 0;
 		this.weapon = value.weapon;
 		this.items = this.items | value.ammo_type;
+		if (value.message && value.message != "")
+			sprint(this, PRINT_MEDIUM, value.message, "\n");
 	};
 	inline get weapon_c current_weapon = { return _current_weapon; };
 
@@ -739,12 +741,12 @@ class player_c : entity
 		if (time < this.pausetime)
 			this.velocity = '0 0 0';
 
-		if (time > this.attack_finished && this.currentammo == 0 && this.weapon != IT_AXE)
+		if (!this.current_weapon.HasAmmo() && this.weapon != IT_AXE)
 		{
 			//bprint(PRINT_HIGH, "prethink\n");
 			//bprint(PRINT_HIGH, "currentammo: ", ftos(this.currentammo), "\n");
 			//bprint(PRINT_HIGH, "weapon: ", ftos(this.weapon), "\n");
-			this.current_weapon = this.GetBestWeapon();
+			this.ChangeWeapon(this.GetBestWeapon());
 		}
 	};
 
@@ -1137,19 +1139,39 @@ class player_c : entity
 			return;
 		}
 
+		WEAPON weap_type = WEAPON::NONE;
 		switch (input)
 		{
 			case 1:
 				weap = this.weapon1;
+
+				if (this.tf_class.weapon2 == WEAPON::PIPEBOMBLAUNCHER
+						&& this.tf_class.weapon1 == WEAPON::GRENADELAUNCHER)
+					weap_type = WEAPON::GRENADELAUNCHER;
+				else
+					weap_type = weap.weapon_type;
 				break;
 			case 2:
-				weap = this.weapon2;
+				// yuck
+				if (this.tf_class.weapon2 == WEAPON::PIPEBOMBLAUNCHER
+						&& this.tf_class.weapon1 == WEAPON::GRENADELAUNCHER)
+				{
+					weap = this.weapon1;
+					weap_type = WEAPON::PIPEBOMBLAUNCHER;
+				}
+				else
+				{
+					weap = this.weapon2;
+					weap_type = weap.weapon_type;
+				}
 				break;
 			case 3:
 				weap = this.weapon3;
+				weap_type = weap.weapon_type;
 				break;
 			case 4:
 				weap = this.weapon4;
+				weap_type = weap.weapon_type;
 				break;
 		}
 
@@ -1157,6 +1179,7 @@ class player_c : entity
 		{
 			if (weap.HasAmmo())
 			{
+				weap.ToggleMode(weap_type); // TODO - make this better
 				this.current_weapon = weap;
 			}
 			else
@@ -1230,23 +1253,23 @@ class player_c : entity
 		self.impulse = 0;
 	};
 
-	nonvirtual weapon_c () GetBestWeapon =
+	nonvirtual float () GetBestWeapon =
     {
         if (this.weapon1.HasAmmo())
 		{
-			return this.weapon1;
+			return 1;
 		}
 
 		if (this.weapon2.HasAmmo())
 		{
-			return this.weapon2;
+			return 2;
 		}
 		if (this.weapon3.HasAmmo())
 		{
-			return this.weapon3;
+			return 3;
 		}
 		
-		return this.weapon4;
+		return 4;
     };
 
 	nonvirtual void () SetupClass =
@@ -1270,7 +1293,17 @@ class player_c : entity
 		
 		if (this.weapon2)
 			remove(this.weapon2);
-		this.weapon2 = weapon_c::spawn(this.tf_class.weapon2, this);
+
+		// hardcoded due to shared clip... meh
+		if (this.tf_class.weapon1 == WEAPON::GRENADELAUNCHER 
+				&& this.tf_class.weapon2 == WEAPON::PIPEBOMBLAUNCHER)
+		{
+			this.weapon2 = this.weapon1;
+		}
+		else
+		{
+			this.weapon2 = weapon_c::spawn(this.tf_class.weapon2, this);
+		}
 
 		if (this.weapon3)
 			remove(this.weapon3);
@@ -1305,8 +1338,10 @@ class player_c : entity
 		this.invincible_time = 0;
 
 		this.SetupClass();
-		
-		this.current_weapon = this.GetBestWeapon();
+		this.is_reloading = FALSE;
+		this.attack_finished = time-1;
+
+		this.ChangeWeapon(this.GetBestWeapon());
 
 		this.attack_finished = time;
 		this.th_pain = this.Pain;

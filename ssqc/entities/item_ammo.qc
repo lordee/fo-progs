@@ -73,7 +73,7 @@ class item_ammo_c : item_c
         stuffcmd(player, "bf\n");
 
         // change to a better weapon if appropriate
-        player.current_weapon = player.GetBestWeapon();
+        player.ChangeWeapon(player.GetBestWeapon());
 
         // remove it in single player, or setup for respawning in deathmatch
         self.model = "";

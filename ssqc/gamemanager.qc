@@ -82,13 +82,13 @@ class gamemanager_c : entity
         precache_model(MODELS::BUBBLE);
         precache_model(MODELS::GRENADE_FLASH);
         precache_model(MODELS::GRENADE_HAND);
+        precache_model(MODELS::GRENADE_SHOCK);
         precache_model(MODELS::VIEW_SHOTGUN);
         precache_model(MODELS::VIEW_SUPERSHOTGUN);
         precache_model(MODELS::VIEW_AXE);
         precache_model(MODELS::VIEW_ROCKETLAUNCHER);
         precache_model(MODELS::ROCKET);
-        precache_model(MODELS::GRENADE_SHOCK);
-        
+        precache_model(MODELS::GRENADE);
     };
 
     nonvirtual void () FirstFrame =

@@ -77,6 +77,11 @@ class weapon_c : entity
         return FALSE;
     };
 
+    virtual void (WEAPON weap) ToggleMode =
+    {
+        
+    };
+
     nonvirtual float () IsReady =
     {
         player_c player = (player_c)this.owner;
@@ -168,7 +173,7 @@ class weapon_c : entity
 
         if (!this.HasAmmo())
         {
-            player.current_weapon = player.GetBestWeapon();
+            player.ChangeWeapon(player.GetBestWeapon());
             return FALSE;
         }
             
